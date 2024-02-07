@@ -1,5 +1,9 @@
 <img src="https://go.dev/images/go-logo-blue.svg" width="150" height="150">
 
+[![Go](https://github.com/LeoCourbassier/golang-grpc-template/actions/workflows/go.yml/badge.svg)](https://github.com/LeoCourbassier/golang-grpc-template/actions/workflows/go.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/LeoCourbassier/golang-grpc-template)](https://goreportcard.com/report/github.com/LeoCourbassier/golang-grpc-template)
+[![codecov](https://codecov.io/gh/LeoCourbassier/golang-grpc-template/branch/main/graph/badge.svg?token=3Z3Z3Z3Z3Z)](https://codecov.io/gh/LeoCourbassier/golang-grpc-template)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # Go gRPC Template
 
 > [!NOTE]
