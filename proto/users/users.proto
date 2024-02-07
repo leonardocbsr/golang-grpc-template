@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+option go_package = "proto/users";
+package users;
+
+service UserService {
+  rpc Ping (PingRequest) returns (PongResponse);
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+  rpc GetByUsername (GetUserByUsernameRequest) returns (GetUserResponse);
+  rpc GetByEmail (GetUserByEmailRequest) returns (GetUserResponse);
+  rpc GetUser (GetUserRequest) returns (GetUserResponse);
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse);
+}
+
+// Ping RPC
+message PingRequest {
+  string message = 1;
+}
+
+message PongResponse {
+  string reply = 1;
+}
+
+// CreateUser RPC
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+  string username = 3;
+  string name = 4;
+}
+
+message CreateUserResponse {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string name = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+// GetUser RPC
+message GetUserRequest {
+  string id = 1;
+}
+
+message GetUserByUsernameRequest {
+  string username = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserResponse {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string name = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+// UpdateUser RPC
+message UpdateUserRequest {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string name = 4;
+}
+
+message UpdateUserResponse {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string name = 4;
+  string updated_at = 5;
+}
+
+// DeleteUser RPC
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserResponse {
+  string id = 1;
+  string deleted_at = 2;
+}

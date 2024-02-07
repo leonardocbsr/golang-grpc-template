@@ -1,0 +1,25 @@
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "password"
+  name: "postgres"
+
+# Logger configuration
+logger:
+  level: "info"
+  format: "pretty"
+
+# gRPC configuration
+server:
+  port: 50051
+  host: "localhost"
+  clients:
+    - name: "ping"
+      host: "localhost"
+      port: 50051
+
+    - name: "users"
+      host: "localhost"
+      port: 50051
