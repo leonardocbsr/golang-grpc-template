@@ -10,7 +10,7 @@ require (
 	github.com/takt-corp/fx-logrus v1.0.1
 	go.uber.org/fx v1.20.1
 	google.golang.org/grpc v1.61.0
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gorm.io/driver/postgres v1.5.6
 	gorm.io/gorm v1.25.7
 )
