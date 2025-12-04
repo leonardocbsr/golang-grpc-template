@@ -3,21 +3,29 @@ package main
 import (
 	"github.com/sirupsen/logrus"
 	fxlogrus "github.com/takt-corp/fx-logrus"
+	"gorm.io/gorm"
 
-	"cbsr.io/golang-grpc-template/common/clients"
-	"cbsr.io/golang-grpc-template/common/controller"
-	"cbsr.io/golang-grpc-template/config"
-	"cbsr.io/golang-grpc-template/db"
-	"cbsr.io/golang-grpc-template/logger"
-	ping "cbsr.io/golang-grpc-template/modules/ping/controllers"
-	"cbsr.io/golang-grpc-template/modules/users/application"
-	users "cbsr.io/golang-grpc-template/modules/users/controllers"
-	"cbsr.io/golang-grpc-template/modules/users/repository"
-	"cbsr.io/golang-grpc-template/server"
+	"github.com/leonardocbsr/golang-grpc-template/internal/clients"
+	"github.com/leonardocbsr/golang-grpc-template/internal/config"
+	"github.com/leonardocbsr/golang-grpc-template/internal/controller"
+	"github.com/leonardocbsr/golang-grpc-template/internal/db"
+	"github.com/leonardocbsr/golang-grpc-template/internal/logger"
+	ping "github.com/leonardocbsr/golang-grpc-template/pkg/ping/controllers"
+	"github.com/leonardocbsr/golang-grpc-template/pkg/server"
+	"github.com/leonardocbsr/golang-grpc-template/pkg/users/application"
+	users "github.com/leonardocbsr/golang-grpc-template/pkg/users/controllers"
+	"github.com/leonardocbsr/golang-grpc-template/pkg/users/models"
+	"github.com/leonardocbsr/golang-grpc-template/pkg/users/repository"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 	"google.golang.org/grpc"
 )
+
+// runMigrations runs database migrations for all models.
+func runMigrations(db *gorm.DB, logger *logrus.Logger) error {
+	logger.Info("Running database migrations...")
+	return db.AutoMigrate(&models.User{})
+}
 
 func main() {
 	fx.New(
@@ -55,6 +63,9 @@ func main() {
 		),
 		// Register controllers
 		fx.Invoke(server.RegisterControllers),
+
+		// Run database migrations
+		fx.Invoke(runMigrations),
 
 		// Start the server
 		fx.Invoke(func(*grpc.Server) {}),

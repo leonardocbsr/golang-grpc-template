@@ -1,0 +1,33 @@
+version: '3'
+
+tasks:
+  run:
+    desc: Generate proto files and start the gRPC server
+    deps: [gen]
+    cmds:
+      - go run .
+
+  build:
+    desc: Generate proto files and build the binary
+    deps: [gen]
+    cmds:
+      - go build .
+
+  gen:
+    desc: Generate mocks using mockgen
+    cmds:
+      - mkdir -p ./internal/mocks/users/application
+      - mkdir -p ./internal/mocks/users/repository
+      - go generate ./...
+
+  test:
+    desc: Generate mocks and run tests with coverage
+    deps: [gen]
+    cmds:
+      - go test -coverprofile cover.out ./...
+      - go tool cover -html=cover.out
+
+  db:
+    desc: Start PostgreSQL database via docker-compose
+    cmds:
+      - docker-compose -f docker-compose.yml up --build --remove-orphans -d db

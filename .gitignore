@@ -6,7 +6,8 @@
 *.dylib
 *.test
 *.out
-go-template
+/go-template
+/golang-grpc-template
 
 # Config file
 config.yaml

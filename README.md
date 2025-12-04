@@ -4,62 +4,211 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/LeoCourbassier/golang-grpc-template)](https://goreportcard.com/report/github.com/LeoCourbassier/golang-grpc-template)
 [![codecov](https://codecov.io/gh/LeoCourbassier/golang-grpc-template/branch/main/graph/badge.svg?token=3Z3Z3Z3Z3Z)](https://codecov.io/gh/LeoCourbassier/golang-grpc-template)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # Go gRPC Template
 
 > [!NOTE]
-> The project is still a work in progress, and there are many features that are not yet implemented. 
-> 
-> Also please note that the gRPC clients are not using any credentials. This is not secure, and should not be used in production. 
-> 
-> Please feel free to contribute to the project.
-> 
-This is a template for gRPC modular monoliths in Go. It is designed to be a starting point for a new project, with all the boilerplate code already set up.
+> This project is a work in progress. Some features are not yet implemented.
+>
+> The gRPC clients do not use credentials by default. This is not secure for production use.
+>
+> Contributions are welcome!
 
-We'll use gRPC as the communication protocol between the different modules, and we'll use the `protoc` compiler to generate the necessary code.
-
+A template for building gRPC modular monoliths in Go. Designed as a starting point for new projects with all boilerplate already configured.
 
 ## Project Structure
 
-The project is divided into directories:
-1. `modules`: This directory contains the different modules of the application. Each module is a self-contained package that contains its own gRPC service implementation. Each module is basically a domain. It contains:
-   1. Controllers (gRPC Layer)
-   2. Application (Service Layer)
-   3. Exceptions (Per module exceptions)
-   4. Models (Domain Layer)
-   5. Repositories (Data Layer)
-   6. Views (gRPC Layer)
-2. `proto`: This directory contains the `.proto` files that define the gRPC services and messages. They are separated into different folders for each module.
-3. `common`, `config`, `db`, `logger`: These directories contain the common code that is used by all the modules. They are not specific to any module, and are used to provide common functionality to all the modules.
+```
+├── internal/                # Private packages (not importable by other projects)
+│   ├── clients/             # gRPC clients for inter-module communication
+│   ├── config/              # Configuration management (Viper)
+│   ├── constants/           # Application constants
+│   ├── controller/          # Controller registration utilities
+│   ├── db/                  # Database connection and initialization
+│   ├── errors/              # Custom error definitions
+│   ├── logger/              # Logging setup
+│   │   └── formatters/      # Log formatters (JSON, pretty, text)
+│   └── mocks/               # Generated mocks for testing
+│
+├── pkg/                     # Public packages (main application modules)
+│   ├── ping/                # Health check module
+│   │   ├── controllers/     # gRPC service handlers
+│   │   └── proto/           # Generated protobuf code
+│   ├── users/               # Users domain module
+│   │   ├── application/     # Business logic (service layer)
+│   │   ├── controllers/     # gRPC service handlers
+│   │   ├── models/          # Domain models and interfaces
+│   │   ├── repository/      # Data access layer
+│   │   ├── proto/           # Generated protobuf code
+│   │   └── views/           # Request/response DTOs
+│   └── server/              # gRPC server setup and registration
+│
+├── docker/                  # Docker-related files
+│   └── db/                  # Database initialization scripts
+│
+├── main.go                  # Application entry point
+├── config.yaml              # Runtime configuration
+├── Taskfile.yaml            # Task runner automation
+├── Dockerfile               # Multi-stage Docker build
+└── docker-compose.yml       # Docker Compose configuration
+```
 
-## Packages Used
-1. `github.com/golang/protobuf`: This package is used to define the `.proto` files and generate the gRPC code.
-2. `google.golang.org/grpc`: This package is used to create the gRPC server and client.
-3. `github.com/jinzhu/gorm`: This package is used to interact with the database.
-4. `github.com/sirupsen/logrus`: This package is used for logging.
-5. `github.com/spf13/viper`: This package is used for configuration management.
-6. `github.com/uber-go/fx`: This package is used for dependency injection.
-7. `github.com/go-playground/validator`: This package is used for input validation.
+### Module Structure
 
-## How to Use
+Each module in `pkg/` follows a layered architecture:
+
+| Layer | Purpose |
+|-------|---------|
+| `controllers/` | gRPC service handlers |
+| `application/` | Business logic and orchestration |
+| `repository/` | Data access and persistence |
+| `models/` | Domain entities and interfaces |
+| `views/` | Request/response DTOs |
+| `proto/` | Generated protobuf code |
+
+## Prerequisites
+
+- [Go 1.24+](https://golang.org/dl/)
+- [Task](https://taskfile.dev/) (task runner)
+- [Docker](https://www.docker.com/) (for database)
+- [protoc](https://grpc.io/docs/protoc-installation/) (protocol buffer compiler)
+
+## Getting Started
+
 1. Clone the repository
-2. Run `go mod tidy` to install the dependencies
-3. Run `make proto` to generate the gRPC code
-4. Run `make run` to start the server
-5. ~~Run `make test` to run the tests~~
-   
+   ```bash
+   git clone https://github.com/LeoCourbassier/golang-grpc-template.git
+   cd golang-grpc-template
+   ```
+
+2. Install dependencies
+   ```bash
+   go mod tidy
+   ```
+
+3. Start the database
+   ```bash
+   task db
+   ```
+
+4. Run the server
+   ```bash
+   task run
+   ```
+
+## Available Tasks
+
+| Command | Description |
+|---------|-------------|
+| `task run` | Generate mocks and start the gRPC server |
+| `task build` | Generate mocks and build the binary |
+| `task test` | Run tests with coverage report |
+| `task gen` | Generate mocks using mockgen |
+| `task db` | Start PostgreSQL via docker-compose |
+
+## Testing
+
+Run all tests with coverage:
+```bash
+task test
+```
+
+This generates a coverage report and opens it in your browser.
+
+### Mock Generation
+
+Mocks are generated using [mockgen](https://github.com/uber-go/mock):
+```bash
+task gen
+```
+
+Generated mocks are placed in `internal/mocks/`.
+
+## Docker
+
+### Start Database Only
+```bash
+task db
+# or
+docker-compose up -d db
+```
+
+### Start Full Application
+```bash
+docker-compose up --build
+```
+
+The gRPC server runs on port `50051` and PostgreSQL on port `5432`.
+
+## Configuration
+
+Configuration is managed via `config.yaml`:
+
+```yaml
+database:
+  host: "localhost"
+  port: 5432
+  user: "postgres"
+  password: "password"
+  name: "postgres"
+
+logger:
+  level: "info"        # debug, info, warn, error
+  format: "pretty"     # pretty, json, text
+
+server:
+  port: 50051
+  host: "localhost"
+  clients:             # Inter-module gRPC clients
+    - name: "ping"
+      host: "localhost"
+      port: 50051
+    - name: "users"
+      host: "localhost"
+      port: 50051
+```
+
+## Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| [google.golang.org/grpc](https://pkg.go.dev/google.golang.org/grpc) | gRPC framework |
+| [google.golang.org/protobuf](https://pkg.go.dev/google.golang.org/protobuf) | Protocol buffers |
+| [gorm.io/gorm](https://gorm.io/) | ORM for database operations |
+| [go.uber.org/fx](https://pkg.go.dev/go.uber.org/fx) | Dependency injection |
+| [github.com/spf13/viper](https://github.com/spf13/viper) | Configuration management |
+| [github.com/sirupsen/logrus](https://github.com/sirupsen/logrus) | Structured logging |
+| [github.com/go-playground/validator](https://github.com/go-playground/validator) | Input validation |
+| [go.uber.org/mock](https://github.com/uber-go/mock) | Mock generation for testing |
+
 ## Features
-1. Modular Monolith: The project is divided into different modules, each of which is a self-contained package. This makes it easy to reason about the code, and makes it easy to scale the project.
-2. gRPC: The communication between the different modules is done using gRPC. This makes it easy to define the service and messages, and the code is generated automatically.
-3. Dependency Injection: We use the `uber-go/fx` package for dependency injection. This makes it easy to manage the dependencies between the different modules.
-4. Configuration Management: We use the `spf13/viper` package for configuration management. This makes it easy to manage the configuration of the application.
-5. Logging: We use the `sirupsen/logrus` package for logging. This makes it easy to log the different events in the application.
-6. Database: We use the `jinzhu/gorm` package to interact with the database. This makes it easy to interact with the database, and provides a lot of functionality out of the box.
-7. Input Validation: We use the `go-playground/validator` package for input validation. This makes it easy to validate the input to the different services.
-8. We provide injectable clients for the different modules, so that they can communicate with each other.
-9. We also provide a `config.yaml` file to manage the configuration of the application including the gRPC server port and the database connection string.
 
+- **Modular Monolith**: Self-contained modules in `pkg/` with clear boundaries
+- **gRPC Communication**: Inter-module communication via gRPC with auto-generated code
+- **Dependency Injection**: Uber's Fx for clean dependency management
+- **Configuration**: Viper-based YAML configuration
+- **Structured Logging**: Logrus with multiple formatters (pretty, JSON, text)
+- **Database**: GORM with PostgreSQL (SQLite available for testing)
+- **Input Validation**: Request validation using go-playground/validator
+- **Testing**: Mock generation and coverage reporting
+- **CI/CD**: GitHub Actions workflow for automated testing
+- **Docker**: Multi-stage builds and docker-compose setup
 
-## What's Next
-- [ ] Add more error handling
-- [ ] Add more tests
-- [ ] Add more documentation
+## Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure your code:
+- Passes all tests (`task test`)
+- Follows existing code style
+- Includes tests for new functionality
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
